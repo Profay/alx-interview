@@ -49,3 +49,4 @@ def pascal_triangle(n):
             pascal_tri.append(cur_row)
 
     return (pascal_tri)
+
