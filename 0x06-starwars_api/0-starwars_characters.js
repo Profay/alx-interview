@@ -1,39 +1,44 @@
 #!/usr/bin/node
-
+/**
+ * a script that prints all characters of a Star Wars movie
+ * use star wars api
+ */
 const request = require('request');
-const movieId = process.argv[2];
-
-function getMovieData(id, callback) {
-  request(`https://swapi.dev/api/films/${id}/`, function(error, response, body) {
-    if (error) {
-      console.error("Error: Unable to retrieve data from API.");
-      process.exit();
-    }
-    const data = JSON.parse(body);
-    callback(data);
-  });
+const film_id = process.argv[2];
+if (!film_id  || isNaN(film_id)) {
+  process.exit(1);
 }
+const url = `https://swapi-api.hbtn.io/api/films/${film_id}`;
 
-function getCharacterData(url, callback) {
-  request(url, function(error, response, body) {
-    if (error) {
-      console.error("Error: Unable to retrieve data from API.");
-      process.exit();
-    }
-    const data = JSON.parse(body);
-    callback(data);
-  });
-}
+request(url, (error, res, body) => {
+  if (error) {
+    console.log(error);
+    return;
+  }
+  const characterList = [];
 
-function displayCharacters(id) {
-  getMovieData(id, function(movieData) {
-    const characters = movieData.characters;
-    for (const characterUrl of characters) {
-      getCharacterData(characterUrl, function(characterData) {
-        console.log(characterData.name);
+  const json = JSON.parse(body);
+  const characters = json.characters;
+
+  characters.forEach((character) => {
+    const url = character;
+    const promise = new Promise((resolve, reject) => {
+      request(url, (error, response, body) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        const json = JSON.parse(body);
+        resolve(json.name);
       });
-    }
+    });
+    characterList.push(promise);
   });
-}
-
-displayCharacters(movieId);
+  Promise.all(characterList).then((values) => {
+    values.forEach((value) => {
+      console.log(value);
+    });
+  }).catch((error) => {
+    console.log(error);
+  });
+});
