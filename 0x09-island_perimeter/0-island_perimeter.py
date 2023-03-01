@@ -20,7 +20,8 @@ def island_perimeter(grid):
 
 
 def get_island_perimeter(grid, start_row, start_col):
-    """Returns the perimeter of the island starting from (start_row, start_col)."""
+    """Returns the perimeter of the island starting
+    from (start_row, start_col)."""
     stack = [(start_row, start_col)]
     visited = set()
     perimeter = 0
@@ -46,4 +47,3 @@ def get_island_perimeter(grid, start_row, start_col):
         if col < len(grid[row])-1 and grid[row][col+1] == 1:
             stack.append((row, col+1))
     return perimeter
-
